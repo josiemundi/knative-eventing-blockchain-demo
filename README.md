@@ -24,8 +24,8 @@ In order to run this demo, you will need:
 
 - A Kubernetes cluster (a single node cluster running on Docker desktop is fine and is used to build this example)
 - kubectl
-- Istio installed (or another Gateway provider such as Gloo)
-- Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation.
+- Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up.
+- Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. 
 
 ## Installing Knative
 
@@ -198,7 +198,7 @@ spec:
     spec:
       containers:
         - name: event-display
-          image: docker.io/josiemundi/test-reply-broker
+          image: docker.io/josiemundi/event-display-ui-reply
 ``` 
 
 

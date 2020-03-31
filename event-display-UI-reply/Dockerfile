@@ -4,7 +4,7 @@
 FROM golang:1.13.4 as builder
 
 # Copy local code to the container image.
-WORKDIR /go/src/github.com/josiemundi/knative-eventing-web-eventsource-reply
+WORKDIR /go/src/github.com/josiemundi/knative-eventing-blockchain-demo/event-display-UI-reply
 COPY . .
 
 # Build the command inside the container.
@@ -24,8 +24,8 @@ FROM alpine
 RUN apk add --no-cache ca-certificates
 
 # Copy the binary and public html to the production image from the builder stage.
-COPY --from=builder /go/src/github.com/josiemundi/knative-eventing-web-eventsource-reply/eventdisplay /eventdisplay
-COPY --from=builder /go/src/github.com/josiemundi/knative-eventing-web-eventsource-reply/public /public
+COPY --from=builder /go/src/github.com/josiemundi/knative-eventing-blockchain-demo/event-display-UI-reply /event-display-UI-reply
+COPY --from=builder /go/src/github.com/josiemundi/knative-eventing-blockchain-demo/event-display-UI-reply/public /public
 
 # Run the web service on container startup.
 CMD ["/eventdisplay"]
