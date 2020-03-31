@@ -1,0 +1,7 @@
+# Namespace for sample application with eventing enabled
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: knative-eventing-websocket-source
+  labels:
+       knative-eventing-injection: enabled

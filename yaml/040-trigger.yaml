@@ -1,0 +1,17 @@
+# Knative Eventing Trigger to trigger the helloworld-go service
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: wsevent-trigger
+  namespace: knative-eventing-websocket-source
+spec:
+  broker: default
+  filter:
+    sourceAndType:
+      type: ""
+      source: "wss://ws.blockchain.info/inv"
+  subscriber:    
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: event-display

@@ -1,0 +1,21 @@
+# Helloworld-go app deploment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wseventsource
+  namespace: knative-eventing-websocket-source
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: wseventsource
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: wseventsource
+          image: docker.io/josiemundi/wssourcecloudevents:latest
+          env:
+          - name: SINK
+            value: "http://default-broker.knative-eventing-websocket-source.svc.cluster.local"

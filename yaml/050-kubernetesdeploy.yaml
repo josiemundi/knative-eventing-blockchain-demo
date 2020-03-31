@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-display
+  namespace: knative-eventing-websocket-source
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &labels
+      app: event-display
+  template:
+    metadata:
+      labels: *labels
+    spec:
+      containers:
+        - name: event-display
+          #image: docker.io/josiemundi/webserver-matt
+          #image: docker.io/josiemundi/bitcoinfrontendnew
+          image: docker.io/josiemundi/test-reply-broker
