@@ -24,7 +24,7 @@ In order to run this demo, you will need:
 
 - A Kubernetes cluster (a single node cluster running on Docker desktop is fine and is used to build this example)
 - kubectl
-- Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up.
+- Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up (instructions can be found at [this](https://knative.dev/docs/install/installing-istio/) link).
 - Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. 
 
 ## Installing Knative
