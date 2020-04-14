@@ -1,0 +1,10 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: classifier
+  namespace: knative-eventing-websocket-source
+spec:
+  template:
+    spec:
+      containers:
+        - image: docker.io/josiemundi/classifier-transaction-size:latest

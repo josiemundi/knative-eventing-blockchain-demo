@@ -1,0 +1,16 @@
+apiVersion: eventing.knative.dev/v1alpha1
+kind: Trigger
+metadata:
+  name: classify-trigger-test
+  namespace: knative-eventing-websocket-source
+spec:
+  broker: default
+  filter:
+    sourceAndType:
+      type: "dev.knative.eventing.josiemundi.transaction.classifer"
+      source: "https://knative.dev/josiemundi/classifier-transaction-size"
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1alpha1
+      kind: Service
+      name: test-display
