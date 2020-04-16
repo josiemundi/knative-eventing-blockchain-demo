@@ -6,7 +6,7 @@ This project explores Knative Eventing. The aim of the project is to show a how 
 
 In this tutorial, you will deploy a go application that streams messages to a Knative broker. A service (event display) can subscribe to the events and they can be displayed in real time via a UI. 
 
-The architecture with just a single consumer is as follows: 
+The basic architecture that will be deployed by the end of this tutorial will look as follows: 
 
 ![Diagram](images/knativedemooverviewsf.png)
 
@@ -27,6 +27,7 @@ In order to run this demo, you will need:
 - Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up (instructions can be found at [this](https://knative.dev/docs/install/installing-istio/) link).
 - Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. 
 
+
 ## Installing Knative
 
 To confirm your install is complete, you can run the following command:
@@ -45,11 +46,11 @@ kubectl get pods -n <namespace>
 
 ## Building the Docker image
 
-The Docker images are already available for the each service in this tutorial, however if you want to make your own then you can build yourself. Each application/service folder has it's own Dockerfile.  
+The Docker images are already available for each service in this tutorial, however if you want to make your own then you can build the image yourself. Each application/service folder has it's own Dockerfile.  
 
 To build a container image, from the application folder you can run the following commands (ensure you are also logged into your image repo account e.g Dockerhub):
 
-example to build:
+example to build a Docker image:
 
 ```bash
 docker build -t <username>/bitcoinfrontend .
@@ -82,9 +83,7 @@ This will deploy the `knative-eventing-websocket-source` namespace and enable th
 
 Verify that the default broker is ready by running `kubectl get broker -n <namespace>` and you should see that the default broker has a status of `READY=True`. 
 
-You now have a broker within a `knative-eventing-websocket-source` namespace:
-
-![Diagram](images/setup-namespace.png)
+You now have a broker within a `knative-eventing-websocket-source` namespace.
 
 ## Deploy the blockchain service that will stream messages
 
@@ -167,62 +166,15 @@ curl http://localhost:31234/events
 ```
 
 
-## Get reply events from broker
+## Classify and Reply
 
-### Re-deploy the UI Deployment
+### Deploy the classifier
 
-If you want to set up reply events then you will need to change your image in the `050-kubernetesdeploy.yaml`. 
+The files to build your own image for the classifier service are in the classifier-transaction-size folder.
 
-You can do this by deleting the current 050-kubernetesdeploy.yaml:
+cd into the yaml/classification folder and apply the 031-classifier-service.yaml and the two triggers that are in there. 
 
-```bash
-kubectl delete -f 050-kubernetesdeploy.yaml
-```
-
-Now edit the image in the yaml file as below: 
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: event-display
-  namespace: knative-eventing-websocket-source
-spec:
-  replicas: 1
-  selector:
-    matchLabels: &labels
-      app: event-display
-  template:
-    metadata:
-      labels: *labels
-    spec:
-      containers:
-        - name: event-display
-          image: docker.io/josiemundi/event-display-ui-reply
-``` 
-
-
-If you want to build the image yourself, you can find all the code in the event-display-UI-reply folder.
-
-You can now re-deploy this file `kubectl apply -f 050-kubernetes-deploy.yaml`.
-
-### Subscribe to reply events
-
-Now we need to add another trigger, this time subscribing only to the reply events (that’s our newEvent that we set up in the go code). 
-
-`041-trigger-reply.yaml` - This specifies that all (reply) messages of type `source="https://knative.dev/josiemundi/transactionClassified" should be sent to the Test Display service. 
-
-In the yaml folder you can create this trigger:
-
-```bash
-kubectl apply -f 041-trigger-reply.yaml
-```
-
-You can see that, in this case, we specify the source as `https://knative.dev/josiemundi/transactionClassified` . 
-
-This time, our subscriber is a Knative service called test-display, which we still need to deploy.
-
-
+Return to the main yaml folder. This time, our subscriber is a Knative service called test-display, which we still need to deploy.
 
 
 ### Deploy the subscriber for reply events and verify
@@ -243,7 +195,7 @@ kubectl logs -l serving.knative.dev/service=test-display -c user-container --tai
 
 You now have the following deployed:
 
-![Diagram](images/end-to-end.png)
+![Diagram](images/deployment-classify.png)
 
 
 
