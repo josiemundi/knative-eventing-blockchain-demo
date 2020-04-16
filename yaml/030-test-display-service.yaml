@@ -2,7 +2,7 @@ apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
   name: test-display
-
+  namespace: knative-eventing-websocket-source
 spec:
   template:
     spec:
