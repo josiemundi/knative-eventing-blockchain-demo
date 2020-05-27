@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This project explores Knative Eventing. The aim of the project is to show a how a stream of events can be consumed and displayed in real-time using Knative Eventing. 
+This project explores Knative Eventing. The aim of the project is to show a how a stream of events can be consumed and displayed in real-time using Knative Eventing. It is assumed that you already have an idea of what Knative is and have perhaps already deployed one of their starter demos, like the [hello-world example](https://knative.dev/docs/eventing/samples/helloworld/helloworld-go/). 
 
 In this tutorial, you will deploy a go application that streams messages to a Knative broker. A service (event display) can subscribe to the events and they can be displayed in real time via a UI. 
 
@@ -10,7 +10,7 @@ The basic architecture that will be deployed by the end of this tutorial will lo
 
 ![Diagram](images/knativedemooverviewsf.png)
 
-In the case where you only have one consumer/subscriber, you can also sink straight to there (in this case that would be the event-display service). 
+In the case where you only have one consumer/subscriber, you can also sink straight to that service instead of the broker (in this case that would be the event-display service). 
 
 There is also the option to have the service reply back to the broker with another event, which can then be consumed by another service from the Knative Eventing ecosystem. The architecture then looks as follows:
 
@@ -18,13 +18,13 @@ There is also the option to have the service reply back to the broker with anoth
 
 ## Pre-requisites
 
-The message stream source is the blockchain.info WebSocket API and sends information about new bitcoin transactions in real-time. You can find more information about this service [here](https://www.blockchain.com/api/api_websocket).
+The message stream source is the blockchain.info WebSocket API and sends information about new bitcoin transactions in real-time. You can find more information about this service [here](https://www.blockchain.com/api/api_websocket). 
 
 In order to run this demo, you will need:
 
-- A Kubernetes cluster (a single node cluster running on Docker desktop is fine and is used to build this example)
+- A Kubernetes cluster (a single node cluster running on Docker desktop is fine and is used to build this example). I have tested using Docker desktop only so far.
 - kubectl
-- Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up (instructions can be found at [this](https://knative.dev/docs/install/installing-istio/) link).
+- Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up (instructions to install Istio and information about cluster-local-gateway can be found at [this](https://knative.dev/docs/install/installing-istio/) link). 
 - Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. 
 
 
@@ -50,13 +50,13 @@ The Docker images are already available for each service in this tutorial, howev
 
 To build a container image, from the application folder you can run the following commands (ensure you are also logged into your image repo account e.g Dockerhub):
 
-example to build a Docker image:
+Docker build example:
 
 ```bash
 docker build -t <username>/bitcoinfrontend .
 ```
 
-example to push: 
+Docker push example: 
 
 ```bash
 docker push <username>/bitcoinfrontend
@@ -113,13 +113,13 @@ You can also verify the broker logs:
 kubectl --namespace knative-eventing-websocket-source logs -l eventing.knative.dev/broker=default --tail=100
 ```
 
-You now have a service that listens for events on a websocket and then send these on as CloudEvents into the Knative Eventing broker, which is our sink:
+You now have a service that listens for events on a websocket (WS) and then sends these on as CloudEvents into the Knative Eventing broker, which is our sink:
 
 ![Diagram](images/deploy-blockchain-service.png)
 
 ## Deploy the trigger
 
-`040-trigger.yaml` - This specifies that all messages that come to the default broker from our blockchain source should be sent to the Event Display service (which is not deployed yet).
+`040-trigger.yaml` - Specifies that all messages that come to the default broker from our blockchain source should be sent to the Event Display service (which is not deployed yet).
 
 Create a trigger using the following command:
 
@@ -133,9 +133,9 @@ You now have a trigger:
 
 ## Deploy the Event Display service
 
-`050-kubernetesdeploy.yaml` - This is a Kubernetes app deployment for consuming the CloudEvents and serving them at a front-end UI. 
+`050-kubernetesdeploy.yaml` - Kubernetes app deployment for consuming the CloudEvents and serving them at a front-end UI. 
 
-`060-kubernetesservice.yaml` - This file defines a Kubernetes service in order to specify the requirements of our Event Display application. It includes the ports needed to run the application and also sets it to be accessible on NodePort 31234 (you can change this if you want). 
+`060-kubernetesservice.yaml` - Defines a Kubernetes service in order to specify the requirements of our Event Display application. It includes the ports needed to run the application and also sets it to be accessible on NodePort 31234 (you can change this if you want). 
 
 Apply both of these files using the following commands:
 
@@ -145,9 +145,7 @@ kubectl apply -f 050-kubernetesdeploy.yaml
 kubectl apply -f 060-kubernetesservice.yaml
 ```
 
-Note on UI Display:
-
-Knative serving does not currently allow multiple ports so the Event Display part is a Kubernetes deployment (consisting of two files; 050 & 060). This is because we need to expose both 8080 (to receive the events) and 9080 (to serve the events). 
+**Note on UI Display:** Knative serving does not currently allow multiple ports so the Event Display part is a Kubernetes deployment (consisting of two files; 050 & 060). This is because we need to expose both 8080 (to receive the events) and 9080 (to serve the events). 
 
 Now you have messages from the blockchain application being sent as real time events to the UI front-end service:
 
@@ -155,7 +153,7 @@ Now you have messages from the blockchain application being sent as real time ev
 
 ### See events in UI:
 
-Head to localhost:31234 and you should see the events in the UI
+Head to http://localhost:31234 and you should see the events in the UI
 
 ### Curl the service:
 
@@ -179,9 +177,9 @@ Return to the main yaml folder. This time, our subscriber is a Knative service c
 
 ### Deploy the subscriber for reply events and verify
 
-`030-test-display-service.yaml` - This deploys a Knative service that will be subscribed to the reply events. It uses the Knative event-display image. 
+`030-test-display-service.yaml` - Deploys a Knative service that will be subscribed to the reply events. It uses the Knative event-display image. 
 
-Deploy the simple display service, which is subscribed only to the reply messages. 
+Deploy the simple display service, which is subscribed only to the reply messages.: 
 
 ```bash
 kubectl apply -f 030-test-display-service.yaml
