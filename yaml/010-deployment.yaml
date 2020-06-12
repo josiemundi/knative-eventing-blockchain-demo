@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: wseventsource
-          image: docker.io/josiemundi/wssourcecloudevents:latest
+          image: docker.io/josiemundi/wseventsource-v2
           env:
           - name: SINK
-            value: "http://default-broker.knative-eventing-websocket-source.svc.cluster.local"
+            value: "http://broker-ingress.knative-eventing.svc.cluster.local/knative-eventing-websocket-source/default"
