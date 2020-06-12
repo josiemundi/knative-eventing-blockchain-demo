@@ -25,7 +25,7 @@ In order to run this demo, you will need:
 - A Kubernetes cluster (a single node cluster running on Docker desktop is fine and is used to build this example). I have tested using Docker desktop only so far.
 - kubectl
 - Istio installed (or another Gateway provider such as Gloo). You will need cluster local gateway set up (instructions to install Istio and information about cluster-local-gateway can be found at [this](https://knative.dev/docs/install/installing-istio/) link). 
-- Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. 
+- Knative installed as per [this](https://knative.dev/docs/install/any-kubernetes-cluster/) documentation. (Has been updated and tested using Knative 0.15)
 
 
 ## Installing Knative
@@ -88,6 +88,10 @@ You now have a broker within a `knative-eventing-websocket-source` namespace.
 ## Deploy the blockchain service that will stream messages
 
 The `010-deployment.yaml` deploys a Kubernetes application (written in Go), which connects to the blockchain websocket stream and sends the messages to the broker.
+
+This demo uses the broker url format in Knative eventing 0.15. If you are using an earlier version of Knative eventing, you may need to check the broker url that is supplied as an environmental variable for the sink. You can check this by running:
+
+```kubectl --namespace knative-eventing-websocket-source get Broker default```
 
 Navigate to the blockchain-app folder:
 
