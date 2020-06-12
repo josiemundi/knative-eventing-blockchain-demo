@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"github.com/cloudevents/sdk-go"
+	"log"
+
+	cloudevents "github.com/cloudevents/sdk-go/v2"
 	"github.com/gorilla/websocket"
 	"github.com/kelseyhightower/envconfig"
-	"log"
 )
 
 const source = "wss://ws.blockchain.info/inv"
@@ -27,18 +28,12 @@ func main() {
 		sink = config.Sink
 	}
 
-	log.Print("Connecting to sink: ", sink)
-	t, err := cloudevents.NewHTTPTransport(
-		cloudevents.WithTarget(sink),
-	)
+	ce, err := cloudevents.NewDefaultClient()
 	if err != nil {
-		log.Fatalf("failed to create transport, " + err.Error())
+		log.Fatalf("Failed to create a http cloudevent client: %s", err.Error())
 	}
 
-	ce, err := cloudevents.NewClient(t,
-		cloudevents.WithUUIDs(),
-		cloudevents.WithTimeNow(),
-	)
+	ctx := cloudevents.ContextWithTarget(context.Background(), sink)
 
 	if err != nil {
 		log.Fatalf("unable to create cloudevent client: " + err.Error())
@@ -66,10 +61,10 @@ func main() {
 		event := cloudevents.NewEvent()
 		event.SetType("websocket-event")
 		event.SetSource(source)
-		event.SetData(message)
+		_ = event.SetData(cloudevents.ApplicationJSON, message)
 
-		if _, _, err := ce.Send(context.TODO(), event); err != nil {
-			log.Printf("sending event to channel failed: %v", err)
+		if result := ce.Send(ctx, event); !cloudevents.IsACK(result) {
+			log.Printf("sending event to channel failed: %v", result)
 		}
 	}
 }
